@@ -28,7 +28,7 @@ ActiveAdmin.register Lead do
                    "property_type" => @lead.property_type,
                 }
     params = {
-              "test" => "0",
+              "test" => "1",
               "affiliate_id" => 821578,
               "api_key" => "EBE96F39-A0CD-F2B6-1201-475C85CBFB1C",
               "sourceurl" => "mywebsiteurl.com",
