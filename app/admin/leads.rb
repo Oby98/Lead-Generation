@@ -7,19 +7,95 @@ ActiveAdmin.register Lead do
                 :property_type, :ip, :useragent, :trustedform, :leadid, :date
 
   collection_action :ping, method: :put do
-    byebug
+
     @lead = Lead.find(params[:format])
 
     endpoint = "https://api.adventum.co/ping/"
-    uri = URI(endpoint)
-    params = @lead.attributes.merge({})
-    #
-    # uri.query = URI.encode_www_form(params)
-    # res = Net::HTTP.get_response(uri)
-    #
-    # data = JSON.parse(res.body)
+    request = {
+               "trustedform" => @lead.trustedform,
+               "leadid" => @lead.leadid,
+               "date" => @lead.date.strftime("%Y-%M-%d %H:%M:%S"),
+               "useragent" => @lead.useragent,
+               "ip" => @lead.ip,
+               "zip" => @lead.zip,
+                }
+    attributes = {
+                   "project_type" => @lead.project_type,
+                   "roof_material" => @lead.roof_material,
+                   "timeframe" => @lead.timeframe,
+                   "besttimecall" => @lead.besttimecall,
+                   "homeowner" => @lead.homeowner,
+                   "property_type" => @lead.property_type,
+                }
+    params = {
+              "test" => "0",
+              "affiliate_id" => 821578,
+              "api_key" => "EBE96F39-A0CD-F2B6-1201-475C85CBFB1C",
+              "sourceurl" => "mywebsiteurl.com",
+              "campaign_id" => "123456",
+              "sub_id" => "123456",
+              "quote_type" => "roofing",
+              "request" => request,
+              "attributes" => attributes,
+                }
+
+    url = URI(endpoint)
+    https = Net::HTTP.new(url.host, url.port)
+    https.use_ssl = true
+
+    request = Net::HTTP::Post.new(url)
+    request["Content-Type"] = "application/json"
+    request.body = JSON.dump(params)
+    response = https.request(request)
+    @data = JSON.parse(response.read_body)
+    if @data["status"] != "success"
+      return redirect_to({action: :index}, alert: "Ping failed with the following message: #{@data["message"]}!")
+    end
+    @lead.update(bid_id: @data["bid"]["bid_id"], price: @data["bid"]["price"])
+    Request.create(status: @data["status"], category: 'Ping', message: @data["message"], bid: @data["bid"]["bid_id"], price: @data["bid"]["price"], lead_id: @lead.id)
 
     render 'admin/leads/ping.erb'
+  end
+
+  collection_action :post, method: :put do
+    @lead = Lead.find(@_params[:format])
+
+    endpoint = "https://api.adventum.co/post/"
+    request = {
+      "trustedform" => @lead.trustedform,
+      "leadid" => @lead.leadid,
+      "date" => @lead.date.strftime("%Y-%M-%d %H:%M:%S"),
+      "useragent" => @lead.useragent,
+      "ip" => @lead.ip,
+      "zip" => @lead.zip,
+      "firstname" => @lead.firstname,
+      "lastname" => @lead.lastname,
+      "address" => @lead.address,
+      "email" => @lead.email,
+      "phone" => @lead.phone,
+    }
+    params = {
+      "quote_type" => "roofing",
+      "bid_id" => @lead.bid_id,
+      "request" => request,
+    }
+
+    url = URI(endpoint)
+    https = Net::HTTP.new(url.host, url.port)
+    https.use_ssl = true
+
+    request = Net::HTTP::Post.new(url)
+    request["Content-Type"] = "application/json"
+    request.body = JSON.dump(params)
+    response = https.request(request)
+    @data = JSON.parse(response.read_body)
+    if @data["status"] != "success"
+      return redirect_to({action: :index}, alert: "Post failed with the following message: #{@data["message"]}!")
+    end
+
+    Request.create(status: @data["status"],category: 'Post', message: @data["message"], bid: @data["bid"]["bid_id"], price: @data["bid"]["price"], lead_id: @lead.id)
+
+    return redirect_to({action: :index}, notice: "Successfully posted!!!")
   end
 
   index do
@@ -27,9 +103,9 @@ ActiveAdmin.register Lead do
     id_column
     column :firstname
     column :lastname
-    column :address
-    column :email
     column :phone
+    column :bid_id
+    column :price
 
     column  do |lead|
       link_to 'Ping', ping_admin_leads_path(lead), method: :put
@@ -40,7 +116,7 @@ ActiveAdmin.register Lead do
   form do |f|
     f.inputs do
       f.input :firstname, label: "First Name"
-      f.input :lastname, label: "First Name"
+      f.input :lastname, label: "Last Name"
       f.input :address
       f.input :zip
       f.input :email
@@ -61,3 +137,4 @@ ActiveAdmin.register Lead do
     f.actions
   end
 end
+

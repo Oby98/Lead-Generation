@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_09_164648) do
+ActiveRecord::Schema.define(version: 2022_09_03_122123) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -54,10 +54,23 @@ ActiveRecord::Schema.define(version: 2022_08_09_164648) do
     t.string "besttimecall"
     t.string "homeowner"
     t.string "property_type"
+    t.float "price"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_leads_on_user_id"
+  end
+
+  create_table "requests", force: :cascade do |t|
+    t.string "category"
+    t.string "message"
+    t.string "bid"
+    t.integer "price"
+    t.string "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "lead_id", null: false
+    t.index ["lead_id"], name: "index_requests_on_lead_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -78,4 +91,5 @@ ActiveRecord::Schema.define(version: 2022_08_09_164648) do
   end
 
   add_foreign_key "leads", "users"
+  add_foreign_key "requests", "leads"
 end

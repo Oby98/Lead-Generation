@@ -25,6 +25,7 @@ class CreateLeads < ActiveRecord::Migration[6.1]
       t.string :besttimecall
       t.string :homeowner
       t.string :property_type
+      t.float :price
 
       t.timestamps
     end

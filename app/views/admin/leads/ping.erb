@@ -1,8 +1,8 @@
-<%= form_tag({action: :get_layout}, multipart: true) do %>
+<h1>Ping Response</h1>
+<br>
+<br>
+<h3><strong>Bid ID</strong> : <%= @data["bid"]["bid_id"]%></h3>
+<h3><strong>Price</strong> : <%= @data["bid"]["price"]%></h3>
 
-  <%= form.hidden_field :parent_id, :first_name, value: @lead.first_name %>
-  %= form.hidden_field :parent_id, value: @lead.first_name %>
-  <%= submit_tag "Upload JSON" %>
-
-
-<% end %>%
+<button><%= link_to 'Post', post_admin_leads_path(@lead), method: :put %></button>
+<button><%= link_to "Back", action: :index %></button>
