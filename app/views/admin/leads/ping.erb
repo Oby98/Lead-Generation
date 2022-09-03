@@ -1,0 +1,8 @@
+<%= form_tag({action: :get_layout}, multipart: true) do %>
+
+  <%= form.hidden_field :parent_id, :first_name, value: @lead.first_name %>
+  %= form.hidden_field :parent_id, value: @lead.first_name %>
+  <%= submit_tag "Upload JSON" %>
+
+
+<% end %>%
