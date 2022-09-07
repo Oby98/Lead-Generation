@@ -4,7 +4,7 @@ ActiveAdmin.register Lead do
   scope_to :current_user
   permit_params :firstname, :lastname, :phone, :address, :zip, :email,
                 :project_type, :roof_material, :timeframe, :besttimecall, :homeowner,
-                :property_type, :ip, :useragent, :trustedform, :leadid, :date
+                :property_type, :ip, :useragent, :date
 
   collection_action :ping, method: :put do
 
@@ -12,8 +12,6 @@ ActiveAdmin.register Lead do
 
     endpoint = "https://api.adventum.co/ping/"
     request = {
-               "trustedform" => @lead.trustedform,
-               "leadid" => @lead.leadid,
                "date" => @lead.date.strftime("%Y-%M-%d %H:%M:%S"),
                "useragent" => @lead.useragent,
                "ip" => @lead.ip,
@@ -28,7 +26,7 @@ ActiveAdmin.register Lead do
                    "property_type" => @lead.property_type,
                 }
     params = {
-              "test" => "0",
+              "test" => "1",
               "affiliate_id" => 821578,
               "api_key" => "EBE96F39-A0CD-F2B6-1201-475C85CBFB1C",
               "sourceurl" => "mywebsiteurl.com",
@@ -62,8 +60,6 @@ ActiveAdmin.register Lead do
 
     endpoint = "https://api.adventum.co/post/"
     request = {
-      "trustedform" => @lead.trustedform,
-      "leadid" => @lead.leadid,
       "date" => @lead.date.strftime("%Y-%M-%d %H:%M:%S"),
       "useragent" => @lead.useragent,
       "ip" => @lead.ip,
@@ -121,8 +117,6 @@ ActiveAdmin.register Lead do
       f.input :zip
       f.input :email
       f.input :phone
-      f.input :leadid, label: "Lead ID"
-      f.input :trustedform, label: "Trusted Form"
       f.input :project_type, :as => :select, :collection => ["new", "replace", "repair"], label: "Project Type"
       f.input :roof_material, :as => :select, :collection => ["asphalt", "cedar", "metal", "tar", "tile", "natural"], label: "Roof Material"
       f.input :timeframe, :as => :select, :collection => ["immediately", "within 1 month", "1-3 months", "3-6 months", "within a year", "not sure"], label: "Time Frame"
